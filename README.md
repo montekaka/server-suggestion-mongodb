@@ -1,0 +1,2 @@
+### Start mongodb
+`mongod`
