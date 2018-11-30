@@ -2,6 +2,7 @@
 const mongoose = require('mongoose');
 const mongoDB = 'mongodb://127.0.0.1/mongo_product_suggestion';
 const ProductModel = require('./models/product.js');
+const SuggestModel = require('./models/suggest.js');
 
 const promise = mongoose.connect(mongoDB);
 
@@ -16,3 +17,5 @@ var db = mongoose.connection;
 module.exports.productCreate = ProductModel.create;
 module.exports.productFetch = ProductModel.fetch;
 module.exports.productDestroy = ProductModel.destroy;
+module.exports.productDestroyAll = ProductModel.destroyAll;
+module.exports.suggestFetch = SuggestModel.fetch;
