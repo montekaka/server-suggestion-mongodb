@@ -87,13 +87,17 @@ const create = (req, res) => {
 
 const destroy = (req, res) => {
 	const _id = req.params.id;
-	Product.findOneAndRemove({_id: _id}, (err, product) => {
-		if(err) {
-			res.sendStatus(404);
-		} else {
-			res.json(product);
-		}
-	});
+	Suggest.deleteMany({productId: {$in: [_id]}}, () =>{
+		Suggest.deleteMany({'suggestProduct._id': {$in: [_id]}}, () => {
+			Product.findOneAndRemove({_id: _id}, (err, product) => {
+				if(err) {
+					res.sendStatus(404);
+				} else {
+					res.json(product);
+				}
+			});
+		})
+	})
 }
 
 const destroyAll = (req, res) => {
