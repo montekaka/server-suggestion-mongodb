@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
+const MongooseAutoIncrement  = require('mongoose-auto-increment-reworked');
 const stringSimilarity = require('string-similarity');
 
 //Define a schema
 const Schema = mongoose.Schema;
+const MongooseAutoIncrementID = MongooseAutoIncrement.MongooseAutoIncrementID;
 
 const ProductModelSchema = new Schema({
 	name: String,
@@ -10,6 +12,8 @@ const ProductModelSchema = new Schema({
 	updateDate: {type: Date, default: Date.now},
 	createdDate: {type: Date, default: Date.now}	
 });
+
+ProductModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Product'});
 
 const Product = mongoose.model('Product', ProductModelSchema);
 
