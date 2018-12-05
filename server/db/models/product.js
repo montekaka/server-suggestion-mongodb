@@ -53,6 +53,9 @@ const create = (req, res) => {
 		  };	  	
 	  })
 	})
+	// .then(() => {
+	// 	res.sendStatus(202);
+	// })
 	.then((result) => {
 		let newProduct = result.newProduct;
 		let products = result.products;

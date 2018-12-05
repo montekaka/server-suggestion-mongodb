@@ -15,6 +15,7 @@
     "express": "^4.16.4",
     "mongodb": "^3.1.10",
     "mongoose": "^5.3.14",
+    "morgan": "^1.9.1",
     "string-similarity": "^2.0.0"
   }
 }
