@@ -1,11 +1,13 @@
 const express = require('express');
+const logger = require('morgan');
 const bodyParser = require('body-parser');
 const router = require('./routes.js');
 const db = require('./db/index.js');
 
-let port = 4203;
+let port = 4202;
 
 const app = express();
+app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
