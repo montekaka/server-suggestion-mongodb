@@ -6,13 +6,16 @@
   "scripts": {
     "start": "node server/app.js",
     "dev": "nodemon --exec node server/app.js",
+    "seed": "node server/db/seed.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "faker": "^4.1.0",
     "mongodb": "^3.1.10",
     "mongoose": "^5.3.14",
     "mongoose-auto-increment-reworked": "^1.2.1",
