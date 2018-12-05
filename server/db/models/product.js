@@ -18,12 +18,14 @@ ProductModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Product'}
 const Product = mongoose.model('Product', ProductModelSchema);
 
 const SuggestModelSchema = new Schema({
-	productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+	productId: Number,
 	suggestProduct: ProductModelSchema,
 	score: Number,
 	updateDate: {type: Date, default: Date.now},
 	createdDate: {type: Date, default: Date.now}		
 })
+
+SuggestModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Suggest'});
 
 const Suggest = mongoose.model('Suggest', SuggestModelSchema);
 
