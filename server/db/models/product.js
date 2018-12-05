@@ -13,7 +13,7 @@ const ProductModelSchema = new Schema({
 	createdDate: {type: Date, default: Date.now}	
 });
 
-ProductModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Product'});
+// ProductModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Product'});
 
 const Product = mongoose.model('Product', ProductModelSchema);
 
@@ -25,7 +25,7 @@ const SuggestModelSchema = new Schema({
 	createdDate: {type: Date, default: Date.now}		
 })
 
-SuggestModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Suggest'});
+// SuggestModelSchema.plugin(MongooseAutoIncrementID.plugin, {modelName: 'Suggest'});
 
 const Suggest = mongoose.model('Suggest', SuggestModelSchema);
 
@@ -117,6 +117,7 @@ const destroyAll = (req, res) => {
 	})
 }
 
+module.exports.Product = Product;
 module.exports.Suggest = Suggest;
 module.exports.create = create;
 module.exports.fetch = fetch;
