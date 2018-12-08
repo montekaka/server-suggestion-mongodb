@@ -3,6 +3,7 @@ const MongooseAutoIncrement  = require('mongoose-auto-increment-reworked');
 const Promise = require('bluebird');
 const fake = require('./../../libs/fake.js');
 const ProductModel = require('./models/product.js');
+const stringSimilarity = require('string-similarity');
 
 const dataGenerator = fake.generator;
 
@@ -17,10 +18,11 @@ const insertProducts = (n , k) => {
 	const e = n / k;
 	const data = [];
 	const startTime = Date.now();
-	const generateProducts = () => {
+	const generateProducts = (batch_number) => {
 		var products = [];		
 		for(var i = 0; i < k; i++) {
-			let product = dataGenerator();
+			let id = i + 1 + batch_number * k;
+			let product = dataGenerator(id);
 			products.push(product);
 		}
 		return products;
@@ -28,28 +30,69 @@ const insertProducts = (n , k) => {
 	for(var j = 0; j < e; j++) {		
 		data.push(generateProducts);
 	}
-	return Promise.map(data, (products) => {
-		return Product.insertMany(products()).then(() => {
-			// console.log('inserted')
+	return Promise.map(data, (products, idx) => {
+		return Product.insertMany(products(idx)).then(() => {
+			console.log('inserted')
 		})
 	}, {
-		concurrency: 1
+		concurrency: 4
 	})
 	.then(() => {
 		return startTime;
 	})
 }
 
-const seed = (n, k) => {
-	insertProducts(n, k).then((startTime) => {
+insertSuggestions = (totalProducts, numberOfSuggestProduct, numberOfSuggestionsPerProduct) => {
+	const offsets = [];
+	while(offsets.length < numberOfSuggestProduct) {
+		let k = Math.floor(Math.random() * Math.floor(totalProducts));
+		if(offsets.includes(k) === false) {
+			offsets.push(k);
+		}
+	}
+
+	return Promise.map(offsets, (idx) => {
+		let k = Math.floor(Math.random() * Math.floor(totalProducts));
+		return Product.find().limit(1).skip(idx).then((product) => {
+			let name = product[0]['name'];
+			let id = product[0]['id'];
+			return Product.find().limit(numberOfSuggestionsPerProduct).skip(k)
+			.then((suggestProducts) => {
+				var bulk = [];
+				suggestProducts.forEach((suggestProduct) => {
+					let _name = suggestProduct['name'];
+					let _id = suggestProduct['id'];
+					if(_id !== id) {
+						let score = stringSimilarity.compareTwoStrings(_name, name);
+						bulk.push({ ProductId: id, suggestProductId: _id, score: score });
+					}
+				});
+				Suggest.insertMany(bulk).then(() => {
+					console.log('inserted suggestions')
+				})
+			});			
+		})
+	}, {
+		concurrency: 10
+	}).then(() => {
+		return true;
+	})		
+}
+
+const seed = (totalProducts, k, numberOfSuggestProduct, numberOfSuggestionsPerProduct) => {
+	insertProducts(totalProducts, k).then((startTime) => {
 		const endTime = Date.now();
 		console.log(`done inserted products from ${startTime} to ${endTime}, finished in ${(endTime - startTime) / (24 * 3600)} min`);
-		process.exit();	
+		// insertSuggestions(totalProducts, numberOfSuggestProduct, numberOfSuggestionsPerProduct)
+		// .then(() => {
+		// 	console.log('done inserted suggestions');
+		// 	process.exit();	
+		// })		
 	});
 }
 
 // seed(100, 10)
-seed(1000, 10);
+seed(100, 10, 10000, 30);
 
 // promise.then((db) => {
 //   console.log('woohoo mongoose connected successfully');
