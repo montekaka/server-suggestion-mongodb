@@ -17,6 +17,7 @@ var db = mongoose.connection;
 module.exports.productCreate = ProductModel.create;
 module.exports.productFetch = ProductModel.fetch;
 module.exports.productGet = ProductModel.get;
+module.exports.productGetSuggestions = ProductModel.getSuggestions;
 module.exports.productDestroy = ProductModel.destroy;
 module.exports.productDestroyAll = ProductModel.destroyAll;
 module.exports.suggestFetch = SuggestModel.fetch;

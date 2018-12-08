@@ -41,7 +41,9 @@ const fetch = (req, res) => {
 
 const get = (req, res) => {
 	const id = req.params.id;
-	
+  const pageNumber = req.query.page ? Number(req.query.page) : 0;
+  const limit = req.query.limit ? Number(req.query.limit) : 10;
+
 	if (id) {
 		Product.findOne({_id: id}, (err, product) => {
 	    if(err) {
@@ -51,13 +53,15 @@ const get = (req, res) => {
 	    }			
 		});
 	} else {
-	  Product.find({}, (err, products) => {
-	    if(err) {
-	      res.sendStatus(404); 
-	    } else {
-	      res.json(products);
-	    }
-	  });		
+		Product.find({}).skip(pageNumber * limit).limit(limit).then((products) => {
+			res.set({
+				'currentPage': pageNumber,
+				limit: limit
+			});
+			res.json(products);
+		}).catch((err) =>{
+			console.log(err)
+		})	
 	}
 }
 
@@ -139,20 +143,28 @@ const destroyAll = (req, res) => {
 	})
 }
 
-// const getSuggestions = (req, res) => {
-// 	const id = req.params.id;
-//   const pageNumber = req.query.page ? Number(req.query.page) : 0;
-//   const limit = req.query.limit ? Number(req.query.limit) : 10;	
-//   Product.findOne({_id: id})
-//   .populate({
-//   	path: ''
-//   })
-// }
+const getSuggestions = (req, res) => {
+	// 5c0c48ba4e68e0649a5f6b2b
+	const id = req.params.id;
+  const pageNumber = req.query.page ? Number(req.query.page) : 0;
+  const limit = req.query.limit ? Number(req.query.limit) : 10;	
+
+  Suggest.find({productId: id}).skip(pageNumber * limit).limit(limit).then((products) => {
+			res.set({
+				'currentPage': pageNumber,
+				limit: limit
+			});  	
+			res.json(products);
+	}).catch((err) =>{
+		console.log(err)
+	});
+}
 
 module.exports.Product = Product;
 module.exports.Suggest = Suggest;
 module.exports.create = create;
 module.exports.fetch = fetch;
 module.exports.get = get;
+module.exports.getSuggestions = getSuggestions;
 module.exports.destroy = destroy;
 module.exports.destroyAll = destroyAll;

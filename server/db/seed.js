@@ -32,7 +32,7 @@ const insertProducts = (n , k) => {
 	}
 	return Promise.map(data, (products, idx) => {
 		return Product.insertMany(products(idx)).then(() => {
-			console.log('inserted')
+			console.log('inserted');
 		})
 	}, {
 		concurrency: 4
@@ -64,7 +64,7 @@ insertSuggestions = (totalProducts, numberOfSuggestProduct, numberOfSuggestionsP
 					let _id = suggestProduct['id'];
 					if(_id !== id) {
 						let score = stringSimilarity.compareTwoStrings(_name, name);
-						bulk.push({ ProductId: id, suggestProductId: _id, score: score });
+						bulk.push({ productId: id, suggestProduct: suggestProduct, score: score });
 					}
 				});
 				Suggest.insertMany(bulk).then(() => {
@@ -83,16 +83,16 @@ const seed = (totalProducts, k, numberOfSuggestProduct, numberOfSuggestionsPerPr
 	insertProducts(totalProducts, k).then((startTime) => {
 		const endTime = Date.now();
 		console.log(`done inserted products from ${startTime} to ${endTime}, finished in ${(endTime - startTime) / (24 * 3600)} min`);
-		// insertSuggestions(totalProducts, numberOfSuggestProduct, numberOfSuggestionsPerProduct)
-		// .then(() => {
-		// 	console.log('done inserted suggestions');
-		// 	process.exit();	
-		// })		
+		insertSuggestions(totalProducts, numberOfSuggestProduct, numberOfSuggestionsPerProduct)
+		.then(() => {
+			console.log('done inserted suggestions');
+			process.exit();	
+		})		
 	});
 }
 
 // seed(100, 10)
-seed(100, 10, 10000, 30);
+seed(10000, 1000, 100, 30);
 
 // promise.then((db) => {
 //   console.log('woohoo mongoose connected successfully');
