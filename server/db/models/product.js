@@ -18,7 +18,7 @@ const ProductModelSchema = new Schema({
 const Product = mongoose.model('Product', ProductModelSchema);
 
 const SuggestModelSchema = new Schema({
-	productId: Number,
+	productId: String,
 	suggestProduct: ProductModelSchema,
 	score: Number,
 	updateDate: {type: Date, default: Date.now},
@@ -37,6 +37,28 @@ const fetch = (req, res) => {
       res.json(products);
     }
   });
+}
+
+const get = (req, res) => {
+	const id = req.params.id;
+	
+	if (id) {
+		Product.findOne({_id: id}, (err, product) => {
+	    if(err) {
+	      res.sendStatus(404); 
+	    } else {
+	      res.json(product);
+	    }			
+		});
+	} else {
+	  Product.find({}, (err, products) => {
+	    if(err) {
+	      res.sendStatus(404); 
+	    } else {
+	      res.json(products);
+	    }
+	  });		
+	}
 }
 
 const create = (req, res) => {
@@ -117,9 +139,20 @@ const destroyAll = (req, res) => {
 	})
 }
 
+// const getSuggestions = (req, res) => {
+// 	const id = req.params.id;
+//   const pageNumber = req.query.page ? Number(req.query.page) : 0;
+//   const limit = req.query.limit ? Number(req.query.limit) : 10;	
+//   Product.findOne({_id: id})
+//   .populate({
+//   	path: ''
+//   })
+// }
+
 module.exports.Product = Product;
 module.exports.Suggest = Suggest;
 module.exports.create = create;
 module.exports.fetch = fetch;
+module.exports.get = get;
 module.exports.destroy = destroy;
 module.exports.destroyAll = destroyAll;
