@@ -68,7 +68,7 @@ insertSuggestions = (totalProducts, numberOfSuggestProduct, numberOfSuggestionsP
 					}
 				});
 				Suggest.insertMany(bulk).then(() => {
-					console.log('inserted suggestions')
+					//console.log('inserted suggestions')
 				})
 			});			
 		})
@@ -85,14 +85,15 @@ const seed = (totalProducts, k, numberOfSuggestProduct, numberOfSuggestionsPerPr
 		console.log(`done inserted products from ${startTime} to ${endTime}, finished in ${(endTime - startTime) / (24 * 3600)} min`);
 		insertSuggestions(totalProducts, numberOfSuggestProduct, numberOfSuggestionsPerProduct)
 		.then(() => {
-			console.log('done inserted suggestions');
+			let suggestionEndTime = Date.now();
+			console.log(`done inserted suggestions ${suggestionEndTime}`);
 			process.exit();	
 		})		
 	});
 }
 
 // seed(100, 10)
-seed(10000, 1000, 100, 30);
+seed(10000000, 10000, 10000, 30);
 
 // promise.then((db) => {
 //   console.log('woohoo mongoose connected successfully');
