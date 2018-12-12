@@ -1,4 +1,6 @@
 const faker = require('faker');
+const _ = require('underscore');
+
 const randomImgUrl = 'https://picsum.photos/200/200/?image=';
 
 function generator(id) {
@@ -10,5 +12,14 @@ function generator(id) {
   }	
 }
 
+function partition(items, size) {
+  var result = _.groupBy(items, function(item, i) {
+      return Math.floor(i/size);
+  });
+  return _.values(result);
+}
+
 exports.generator = generator;
+exports.partition = partition;
+
 

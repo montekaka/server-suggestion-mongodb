@@ -6,6 +6,7 @@ const ProductModel = require('./models/product.js');
 const stringSimilarity = require('string-similarity');
 
 const dataGenerator = fake.generator;
+const partition = fake.partition;
 
 const mongoDB = 'mongodb://127.0.0.1/mongo_product_suggestion';
 const promise = mongoose.connect(mongoDB);
@@ -18,6 +19,7 @@ const insertProducts = (n , k) => {
 	const e = n / k;
 	const data = [];
 	const startTime = Date.now();
+
 	const generateProducts = (batch_number) => {
 		var products = [];		
 		for(var i = 0; i < k; i++) {
@@ -27,12 +29,14 @@ const insertProducts = (n , k) => {
 		}
 		return products;
 	}
+
 	for(var j = 0; j < e; j++) {		
 		data.push(generateProducts);
 	}
+
 	return Promise.map(data, (products, idx) => {
 		return Product.insertMany(products(idx)).then(() => {
-			console.log('inserted');
+			// console.log('inserted');
 		})
 	}, {
 		concurrency: 4
@@ -43,40 +47,45 @@ const insertProducts = (n , k) => {
 }
 
 insertSuggestions = (totalProducts, numberOfSuggestProduct, numberOfSuggestionsPerProduct) => {
-	const offsets = [];
-	while(offsets.length < numberOfSuggestProduct) {
-		let k = Math.floor(Math.random() * Math.floor(totalProducts));
-		if(offsets.includes(k) === false) {
-			offsets.push(k);
-		}
-	}
+	//Product.findAll({offset: 0 , limit: 1})
+	// randomly pick 10000 products, and create 30 suggestions for each of them.
 
-	return Promise.map(offsets, (idx) => {
-		let k = Math.floor(Math.random() * Math.floor(totalProducts));
-		return Product.find().limit(1).skip(idx).then((product) => {
-			let name = product[0]['name'];
-			let id = product[0]['id'];
-			return Product.find().limit(numberOfSuggestionsPerProduct).skip(k)
-			.then((suggestProducts) => {
-				var bulk = [];
-				suggestProducts.forEach((suggestProduct) => {
+	var productRandFrom = Math.floor(Math.random() * Math.floor(totalProducts/2));
+	var suggestionRandFrom = suggestionRandFrom + Math.floor(Math.random() * Math.floor(totalProducts/10));
+	var bulk = [];
+
+	return Product.find().skip(productRandFrom).limit(numberOfSuggestProduct).then((products) => {
+		return Product.find().skip(suggestionRandFrom).limit(numberOfSuggestionsPerProduct).then((suggestions) => {
+			products.forEach((product) => {
+				var name = product['name'];
+				var id = product['_id'];
+				suggestions.forEach((suggestProduct) => {
 					let _name = suggestProduct['name'];
-					let _id = suggestProduct['id'];
+					let _id = suggestProduct['_id'];
 					if(_id !== id) {
 						let score = stringSimilarity.compareTwoStrings(_name, name);
-						bulk.push({ productId: id, suggestProduct: suggestProduct, score: score });
+						bulk.push({ ProductId: id, suggestProduct: suggestProduct, score: score });
 					}
-				});
-				Suggest.insertMany(bulk).then(() => {
-					//console.log('inserted suggestions')
 				})
-			});			
+
+			})
+			return true;
 		})
-	}, {
-		concurrency: 10
+	}).then(() => {
+		return bulk;
+	})
+	.then((productSuggestions) => {
+		return partition(productSuggestions, 100);
+	})
+	.then((productSuggestions) => {
+		return Promise.map(productSuggestions, (suggestions) => {
+			return Suggest.insertMany(suggestions);
+		}, {
+			concurrency: 10
+		})
 	}).then(() => {
 		return true;
-	})		
+	})
 }
 
 const seed = (totalProducts, k, numberOfSuggestProduct, numberOfSuggestionsPerProduct) => {

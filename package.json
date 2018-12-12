@@ -20,6 +20,7 @@
     "mongoose": "^5.3.14",
     "mongoose-auto-increment-reworked": "^1.2.1",
     "morgan": "^1.9.1",
-    "string-similarity": "^2.0.0"
+    "string-similarity": "^2.0.0",
+    "underscore": "^1.9.1"
   }
 }
