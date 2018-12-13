@@ -7,11 +7,13 @@
     "start": "node server/app.js",
     "dev": "nodemon --exec node server/app.js",
     "seed": "node server/db/seed.js",
+    "benchmark": "node server/db/benchmark.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.18.0",
     "bluebird": "^3.5.3",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
