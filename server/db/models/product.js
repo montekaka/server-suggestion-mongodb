@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Promise = require('bluebird');
 const MongooseAutoIncrement  = require('mongoose-auto-increment-reworked');
 const stringSimilarity = require('string-similarity');
 
@@ -160,6 +161,28 @@ const getSuggestions = (req, res) => {
 	});
 }
 
+const sampleOne = (total_count) => {
+	const random = Math.floor(Math.random() * total_count);	
+	return Product.findOne().skip(random);
+}
+
+const sample = (total_count, N) => {
+	let samples = [];
+	var result = [];
+
+	for (var i = 0; i < N; i++) {
+		samples.push(sampleOne);
+	}
+
+	return Promise.map(samples, (fn) => {
+		return fn(total_count).then((data) => {
+			result.push(data._id);
+		})
+	}).then(() => {
+		return result;
+	});
+}
+
 module.exports.Product = Product;
 module.exports.Suggest = Suggest;
 module.exports.create = create;
@@ -168,3 +191,4 @@ module.exports.get = get;
 module.exports.getSuggestions = getSuggestions;
 module.exports.destroy = destroy;
 module.exports.destroyAll = destroyAll;
+module.exports.sample = sample;
