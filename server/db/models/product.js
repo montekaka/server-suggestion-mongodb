@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const _ = require('underscore');
 const Promise = require('bluebird');
 const MongooseAutoIncrement  = require('mongoose-auto-increment-reworked');
 const stringSimilarity = require('string-similarity');

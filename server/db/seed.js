@@ -64,7 +64,7 @@ insertSuggestions = (totalProducts, numberOfSuggestProduct, numberOfSuggestionsP
 					let _id = suggestProduct['_id'];
 					if(_id !== id) {
 						let score = stringSimilarity.compareTwoStrings(_name, name);
-						bulk.push({ ProductId: id, suggestProduct: suggestProduct, score: score });
+						bulk.push({ productId: id, suggestProduct: suggestProduct, score: score });
 					}
 				})
 

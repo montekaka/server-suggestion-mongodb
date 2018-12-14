@@ -1,4 +1,5 @@
 const Suggest = require('./product.js').Suggest;
+const Promise = require('bluebird');
 const _ = require('underscore');
 
 const fetch = (req, res) => {
@@ -28,7 +29,7 @@ const sample = (total_count, N) => {
     return fn(total_count).then((data) => {
       result.push(data.productId);
     })
-  }).then(() => {    
+  }).then(() => {   
     return _.uniq(result);
   });
 }
